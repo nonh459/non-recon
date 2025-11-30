@@ -1,4 +1,4 @@
 id,first_name,last_name,email,age
-1,John,Doe,john@example.com,25
-2,Alice,Smith,alice@example.com,30
-3,Bob,Marley,bob@example.com,45
+John,Doe,john@example.com,25
+Alice,Smith,alice@example.com,30
+Bob,Marley,bob@example.com,45
