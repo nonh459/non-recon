@@ -1,5 +1,6 @@
 package com.nontiwa.nonrecon.simpleetl;
 
+import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -36,7 +37,7 @@ public class CustomerJobConfig {
     }
 
     @Bean
-    public JpaItemWriter<Customer> customerWriter(jakarta.persistence.EntityManagerFactory emf) {
+    public JpaItemWriter<Customer> customerWriter(EntityManagerFactory emf) {
         JpaItemWriter<Customer> writer = new JpaItemWriter<>();
         writer.setEntityManagerFactory(emf);
         return writer;
