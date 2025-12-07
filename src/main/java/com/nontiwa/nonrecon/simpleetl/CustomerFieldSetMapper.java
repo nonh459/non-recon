@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
-import org.springframework.lang.NonNullApi;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -17,7 +16,7 @@ public class CustomerFieldSetMapper implements FieldSetMapper<Customer> {
 
     @Override
     @NonNull
-    public Customer mapFieldSet(FieldSet fieldSet) {
+    public Customer mapFieldSet(@NonNull FieldSet fieldSet) {
         try {
             return Customer.builder()
     //                .id(fieldSet.readLong("id"))
