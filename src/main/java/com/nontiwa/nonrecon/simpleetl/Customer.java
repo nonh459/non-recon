@@ -1,7 +1,10 @@
 package com.nontiwa.nonrecon.simpleetl;
 
+
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.batch.item.ResourceAware;
+import org.springframework.core.io.Resource;
 
 @Entity
 @Table(name = "customer")
@@ -10,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Customer {
+public class Customer implements ResourceAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,4 +28,14 @@ public class Customer {
     private String email;
 
     private int age;
+
+    private String sourceFile;
+
+    @Transient
+    private Resource resource;
+
+    @Override
+    public void setResource(@NonNull Resource resource) {
+        this.resource = resource;
+    }
 }
