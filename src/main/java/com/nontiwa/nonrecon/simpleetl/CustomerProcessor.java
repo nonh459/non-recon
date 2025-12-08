@@ -12,6 +12,7 @@ public class CustomerProcessor implements ItemProcessor<Customer, Customer> {
         // Example transformation: uppercase names
         c.setFirstName(c.getFirstName().toUpperCase());
         c.setLastName(c.getLastName().toUpperCase());
+        c.setSourceFile(c.getResource().getFilename());
 
         // Example validation
         if (!c.getEmail().contains("@")) return null; // skip invalid

@@ -1,5 +1,7 @@
 package com.nontiwa.nonrecon.simpleetl;
 
+
+
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -9,11 +11,17 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import java.io.IOException;
 
 @Configuration
 @RequiredArgsConstructor
@@ -37,6 +45,22 @@ public class CustomerJobConfig {
     }
 
     @Bean
+    public MultiResourceItemReader<Customer> multiReader(
+            FlatFileItemReader<Customer> delegateReader) throws IOException {
+
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+
+        // Dynamically scan folder and load all matching files
+        Resource[] files = resolver.getResources("file:/data/inbound/customers/*.csv");
+
+        MultiResourceItemReader<Customer> reader = new MultiResourceItemReader<>();
+        reader.setResources(files);
+        reader.setDelegate(delegateReader);
+        return reader;
+    }
+
+
+    @Bean
     public JpaItemWriter<Customer> customerWriter(EntityManagerFactory emf) {
         JpaItemWriter<Customer> writer = new JpaItemWriter<>();
         writer.setEntityManagerFactory(emf);
@@ -45,12 +69,12 @@ public class CustomerJobConfig {
 
     @Bean
     public Step importCustomerStep(JobRepository repo,
-                                   FlatFileItemReader<Customer> reader,
+                                   MultiResourceItemReader<Customer> multiReader,
                                    JpaItemWriter<Customer> writer) {
 
         return new StepBuilder("import-customer-step", repo)
                 .<Customer, Customer>chunk(50, transactionManager)
-                .reader(reader)
+                .reader(multiReader)
                 .processor(processor)
                 .writer(writer)
                 .build();
