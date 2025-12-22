@@ -21,6 +21,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.sql.Timestamp;
 
 @Configuration
 @RequiredArgsConstructor
@@ -39,12 +40,17 @@ public class DailySalesReportJobConfig {
         reader.setSql("""
         SELECT id, product_id, store_id, payment_method, quantity, amount, timestamp 
         FROM recon_dev.sales_transaction 
-        WHERE DATE(timestamp) = :reportDate
-    """);
+        WHERE DATE(timestamp) = ?
+        """);
+
+        reader.setPreparedStatementSetter(ps ->
+                ps.setTimestamp(1, Timestamp.valueOf(date+" 00:00:00"))
+        );
         reader.setRowMapper(new SalesTransactionRowMapper());
         return reader;
     }
 
+    /*
     @Bean
     @StepScope
     public ItemWriter<SalesSummary> summaryWriter(SalesAggregator aggregator,
@@ -54,6 +60,7 @@ public class DailySalesReportJobConfig {
             // ignore incoming items (processor returned null)
         };
     }
+    */
 
     @Bean
     public FlatFileItemWriter<SalesSummary> csvWriter() {
@@ -67,11 +74,11 @@ public class DailySalesReportJobConfig {
 
     @Bean
     public Job dailySalesReportJob(JobRepository repo,
-                                   Step salesStep,
-                                   SalesReportListener listener) {
+                                   Step salesStep
+                                   /*SalesReportListener listener*/) {
         return new JobBuilder("dailySalesReportJob", repo)
                 .start(salesStep)
-                .listener(listener)
+//                .listener(listener)
                 .build();
     }
 
