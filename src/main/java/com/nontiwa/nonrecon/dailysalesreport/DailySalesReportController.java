@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class DailySalesReportController {
 
     private final JobLauncher jobLauncher;
-    private final Job importCustomerJob;
+    private final Job dailySalesReportJob;
 
     @PostMapping("/daily-sales-report")
     public String runDailySaleReportJob() throws Exception {
         jobLauncher.run(
-                importCustomerJob,
+                dailySalesReportJob,
                 new JobParametersBuilder()
                         .addLong("run.id", System.currentTimeMillis())
                         .addString("reportDate", "2025-12-11")
