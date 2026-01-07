@@ -22,7 +22,7 @@ public class DailySalesReportController {
                 dailySalesReportJob,
                 new JobParametersBuilder()
                         .addLong("run.id", System.currentTimeMillis())
-                        .addString("reportDate", "2025-12-11")
+                        .addString("reportDate", "2024-01-01")
                         .toJobParameters()
         );
         return "Daily Sales report job started!";
