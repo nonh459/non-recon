@@ -15,17 +15,14 @@ public class SalesAggregator implements ItemProcessor<SalesTransaction, SalesSum
 
     @Override
     public SalesSummary process(SalesTransaction tx) {
-        String key = tx.getProductId();
 
-        SalesSummary summary = summaryMap.computeIfAbsent(key, k ->
-                new SalesSummary(k, 0, BigDecimal.ZERO, 0)
+        System.out.println("SalesAggregator.process() called");
+        return new SalesSummary(
+                tx.getProductId(),
+                tx.getQuantity(),
+                tx.getAmount(),
+                1
         );
-
-        summary.setTotalQty(summary.getTotalQty() + tx.getQuantity());
-        summary.setTotalAmount(summary.getTotalAmount().add(tx.getAmount()));
-        summary.setSalesCount(summary.getSalesCount() + 1);
-
-        return null; // Avoid writing here (we write at end)
     }
 
     public Collection<SalesSummary> getSummaries() {
