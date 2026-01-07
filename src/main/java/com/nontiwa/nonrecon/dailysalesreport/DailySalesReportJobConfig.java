@@ -50,23 +50,24 @@ public class DailySalesReportJobConfig {
         return reader;
     }
 
-    /*
-    @Bean
-    @StepScope
-    public ItemWriter<SalesSummary> summaryWriter(SalesAggregator aggregator,
-                                                  JdbcBatchItemWriter<SalesSummary> dbWriter) {
 
-        return items -> {
-            // ignore incoming items (processor returned null)
-        };
-    }
-    */
+//    @Bean
+//    @StepScope
+//    public ItemWriter<SalesSummary> summaryWriter(SalesAggregator aggregator,
+//                                                  JdbcBatchItemWriter<SalesSummary> dbWriter) {
+//
+//        return items -> {
+//            // ignore incoming items (processor returned null)
+//        };
+//    }
+
 
     @Bean
     public FlatFileItemWriter<SalesSummary> csvWriter() {
+        System.out.println("FlatFileItemWriter() called");
         return new FlatFileItemWriterBuilder<SalesSummary>()
                 .name("daily-sales-writer")
-                .resource(new FileSystemResource("reports/daily_sales.csv"))
+                .resource(new FileSystemResource("D:/data_backyard/sales/reports/daily_sales.csv"))
                 .delimited()
                 .names("productId", "totalQty", "totalAmount", "salesCount")
                 .build();
@@ -95,8 +96,5 @@ public class DailySalesReportJobConfig {
                 .writer(writer)
                 .build();
     }
-
-
-
 
 }
