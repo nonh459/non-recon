@@ -27,7 +27,6 @@ import java.sql.Timestamp;
 @RequiredArgsConstructor
 public class DailySalesReportJobConfig {
 
-    private final PlatformTransactionManager transactionManager;
 
     @Bean
     @StepScope
@@ -70,6 +69,8 @@ public class DailySalesReportJobConfig {
                 .resource(new FileSystemResource("D:/data_backyard/sales/reports/daily_sales.csv"))
                 .delimited()
                 .names("productId", "totalQty", "totalAmount", "salesCount")
+                .headerCallback(writer ->
+                        writer.write("product_id,quantity,amount,sales_count"))
                 .build();
     }
 
@@ -90,7 +91,7 @@ public class DailySalesReportJobConfig {
                           SalesAggregator processor,
                           ItemWriter<SalesSummary> writer) {
         return new StepBuilder("salesStep", repo)
-                .<SalesTransaction, SalesSummary>chunk(500, transactionManager)
+                .<SalesTransaction, SalesSummary>chunk(500, txManager)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
