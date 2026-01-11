@@ -15,6 +15,7 @@ import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -30,7 +31,7 @@ public class CustomerJobConfig {
     public FlatFileItemReader<Customer> customerReader(CustomerFieldSetMapper fieldSetMapper) {
         return new FlatFileItemReaderBuilder<Customer>()
                 .name("customer-reader")
-                .resource(new ClassPathResource("customers.csv"))
+                .resource(new FileSystemResource("D:/data_backyard/customer/inbound/customers.csv"))
                 .delimited()
                 .delimiter(",")
                 .names("first_name","last_name","email","age")
