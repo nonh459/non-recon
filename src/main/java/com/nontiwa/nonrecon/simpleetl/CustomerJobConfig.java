@@ -1,15 +1,14 @@
 package com.nontiwa.nonrecon.simpleetl;
 
 
-
-import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.database.JpaItemWriter;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
@@ -21,6 +20,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 
 @Configuration
@@ -60,17 +60,31 @@ public class CustomerJobConfig {
     }
 
 
+//    @Bean
+//    public JpaItemWriter<Customer> customerWriter(EntityManagerFactory emf) {
+//        JpaItemWriter<Customer> writer = new JpaItemWriter<>();
+//        writer.setEntityManagerFactory(emf);
+//        return writer;
+//    }
+
     @Bean
-    public JpaItemWriter<Customer> customerWriter(EntityManagerFactory emf) {
-        JpaItemWriter<Customer> writer = new JpaItemWriter<>();
-        writer.setEntityManagerFactory(emf);
-        return writer;
+    public JdbcBatchItemWriter<Customer> customerWriter(DataSource dataSource) {
+        return new JdbcBatchItemWriterBuilder<Customer>()
+                .dataSource(dataSource)                   // ✅ mandatory
+                .sql("""
+                INSERT INTO recon_dev.customer
+                (age, email, first_name, last_name, source_file)
+                VALUES (:age, :email, :firstName, :lastName, :sourceFile)
+                """)                                       // ✅ mandatory
+                .beanMapped()                              // ✅ mandatory
+                .build();
     }
+
 
     @Bean
     public Step importCustomerStep(JobRepository repo,
                                    MultiResourceItemReader<Customer> multiReader,
-                                   JpaItemWriter<Customer> writer) {
+                                   JdbcBatchItemWriter<Customer> writer) {
 
         return new StepBuilder("import-customer-step", repo)
                 .<Customer, Customer>chunk(50, transactionManager)
