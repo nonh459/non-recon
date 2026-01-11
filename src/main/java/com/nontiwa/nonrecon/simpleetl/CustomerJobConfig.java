@@ -24,7 +24,6 @@ import javax.sql.DataSource;
 import java.io.IOException;
 
 @Configuration
-@RequiredArgsConstructor
 public class CustomerJobConfig {
 
     @Bean
