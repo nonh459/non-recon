@@ -27,12 +27,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomerJobConfig {
 
-    private final CustomerProcessor processor;
-    private final CustomerFieldSetMapper fieldSetMapper;
-    private final PlatformTransactionManager transactionManager;
-
     @Bean
-    public FlatFileItemReader<Customer> customerReader() {
+    public FlatFileItemReader<Customer> customerReader(CustomerFieldSetMapper fieldSetMapper) {
         return new FlatFileItemReaderBuilder<Customer>()
                 .name("customer-reader")
                 .resource(new ClassPathResource("customers.csv"))
@@ -84,7 +80,9 @@ public class CustomerJobConfig {
     @Bean
     public Step importCustomerStep(JobRepository repo,
                                    MultiResourceItemReader<Customer> multiReader,
-                                   JdbcBatchItemWriter<Customer> writer) {
+                                   JdbcBatchItemWriter<Customer> writer,
+                                   PlatformTransactionManager transactionManager,
+                                   CustomerProcessor processor) {
 
         return new StepBuilder("import-customer-step", repo)
                 .<Customer, Customer>chunk(50, transactionManager)
