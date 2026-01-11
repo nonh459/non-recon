@@ -66,16 +66,16 @@ public class DailySalesReportJobConfig {
         queryProvider.setSelectClause("""
         SELECT id, product_id, store_id, payment_method,
                quantity, amount, timestamp
-    """);
+        """);
 
         queryProvider.setFromClause("""
         FROM recon_dev.sales_transaction
-    """);
+        """);
 
         queryProvider.setWhereClause("""
         WHERE timestamp >= :startDate
           AND timestamp < :endDate
-    """);
+        """);
 
         // REQUIRED for paging
         queryProvider.setSortKeys(Map.of("id", Order.ASCENDING));
@@ -96,7 +96,7 @@ public class DailySalesReportJobConfig {
 
     @Bean
     public FlatFileItemWriter<SalesSummary> csvWriter() {
-        System.out.println("FlatFileItemWriter() called");
+
         return new FlatFileItemWriterBuilder<SalesSummary>()
                 .name("daily-sales-writer")
                 .resource(new FileSystemResource("D:/data_backyard/sales/reports/daily_sales.csv"))
