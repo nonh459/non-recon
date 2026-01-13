@@ -13,6 +13,7 @@ import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
@@ -41,8 +42,10 @@ public class TradeJobConfig {
                 INSERT INTO recon_dev.trade_leg
                 ("leg_id","trade_id","instrument","price","leg_quantity")
                 VALUES (:legId, :tradeId, :instrument, :price, :legQuantity)
+                ON CONFLICT ON CONSTRAINT trade_leg_pkey DO NOTHING
                 """)                                       // ✅ mandatory
                 .beanMapped()                              // ✅ mandatory
+                .assertUpdates(false)   // 🔑 IMPORTANT
                 .build();
     }
 
@@ -58,6 +61,9 @@ public class TradeJobConfig {
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
+//                .faultTolerant()
+//                .skip(DuplicateKeyException.class)
+//                .skipLimit(100)
                 .build();
     }
 
